@@ -18,6 +18,7 @@ import {
   useColorScheme,
   View,
 } from 'react-native';
+import { authorize } from 'react-native-app-auth';
 
 import {
   Colors,
@@ -55,9 +56,31 @@ const Section: React.FC<{
   );
 };
 
+const config = {
+  redirectUrl: 'com.redditech.auth://oauth2redirect/reddit',
+  clientId: 'J3wD24v0xSwSgWHTPsYMFg',
+  clientSecret: '', // empty string - needed for iOS
+  scopes: ['identity'],
+  serviceConfiguration: {
+    authorizationEndpoint: 'https://www.reddit.com/api/v1/authorize.compact',
+    tokenEndpoint: 'https://www.reddit.com/api/v1/access_token',
+  },
+  customHeaders: {
+    token: {
+      Authorization: 'Basic <base64encoded clientID:>',
+    },
+  },
+};
+
+async function login() {
+  const authState = await authorize(config);
+
+  return authState;
+}
+
 const App = () => {
   const isDarkMode = useColorScheme() === 'dark';
-
+  const loginState = login();
   const backgroundStyle = {
     backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
   };
