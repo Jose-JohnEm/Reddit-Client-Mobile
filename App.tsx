@@ -65,7 +65,6 @@ const App = () => {
     )
   }
   const refreshAccount = () => {
-    if (!authState.refreshToken) { return }
     refresh(config, { refreshToken: authState.refreshToken }).then(
       (newAuthState) => {
         setAuthState(
@@ -88,7 +87,6 @@ const App = () => {
   }
   const revokeAccount =
     () => {
-      if (!authState.accessToken) { return }
       revoke(config, { tokenToRevoke: authState.accessToken, sendClientId: true }).then(
         () => {
           setAuthState(
