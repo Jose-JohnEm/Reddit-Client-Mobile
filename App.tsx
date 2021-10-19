@@ -8,115 +8,136 @@
  * @format
  */
 
-import React from 'react';
-import {
-  SafeAreaView,
-  ScrollView,
-  StatusBar,
-  StyleSheet,
-  Text,
-  useColorScheme,
-  View,
-} from 'react-native';
-import { authorize } from 'react-native-app-auth';
+import React, { useState, useEffect } from 'react';
+import { Button, View, StatusBar, StyleSheet, Text } from 'react-native'
+import { authorize, refresh, revoke } from 'react-native-app-auth';
 
-import {
-  Colors,
-  DebugInstructions,
-  Header,
-  LearnMoreLinks,
-  ReloadInstructions,
-} from 'react-native/Libraries/NewAppScreen';
-
-const Section: React.FC<{
-  title: string;
-}> = ({ children, title }) => {
-  const isDarkMode = useColorScheme() === 'dark';
-  return (
-    <View style={styles.sectionContainer}>
-      <Text
-        style={[
-          styles.sectionTitle,
-          {
-            color: isDarkMode ? Colors.white : Colors.black,
-          },
-        ]}>
-        {title}
-      </Text>
-      <Text
-        style={[
-          styles.sectionDescription,
-          {
-            color: isDarkMode ? Colors.light : Colors.dark,
-          },
-        ]}>
-        {children}
-      </Text>
-    </View>
-  );
-};
-
-const config = {
+const config =
+{
   redirectUrl: 'com.redditech.auth://oauth2redirect/reddit',
   clientId: 'J3wD24v0xSwSgWHTPsYMFg',
   clientSecret: '', // empty string - needed for iOS
   scopes: ['identity'],
+  duration: "permanent",
   serviceConfiguration: {
     authorizationEndpoint: 'https://www.reddit.com/api/v1/authorize.compact',
     tokenEndpoint: 'https://www.reddit.com/api/v1/access_token',
+    revocationEndpoint: 'https://www.reddit.com/api/v1/revoke_token'
   },
   customHeaders: {
     token: {
+      // Authorization: Buffer.from('J3wD24v0xSwSgWHTPsYMFg').toString('base64'),
       Authorization: 'Basic <base64encoded clientID:>',
     },
   },
 };
 
-async function login() {
-  const authState = await authorize(config);
-
-  return authState;
-}
-
 const App = () => {
-  const isDarkMode = useColorScheme() === 'dark';
-  const loginState = login();
-  const backgroundStyle = {
-    backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
-  };
+  const [authState, setAuthState] = useState(
+    {
+      hasLoggedInOnce: false,
+      accessToken: '',
+      accessTokenExpirationDate: '',
+      refreshToken: '',
+    }
+  )
+
+  const authorizeAccount = () => {
+    authorize(config).then(
+      (newAuthState) => {
+        setAuthState(
+          {
+            hasLoggedInOnce: true,
+            accessToken: newAuthState.accessToken,
+            accessTokenExpirationDate: newAuthState.accessTokenExpirationDate,
+            refreshToken: newAuthState.refreshToken,
+          }
+        )
+        console.log(newAuthState)
+      },
+      (message) => {
+        console.log('User refused to log in :', message)
+      }
+    ).catch(
+      (error) => {
+        console.log('Failed to log in :', error.message)
+      }
+    )
+  }
+  const refreshAccount = () => {
+    if (!authState.refreshToken) { return }
+    refresh(config, { refreshToken: authState.refreshToken }).then(
+      (newAuthState) => {
+        setAuthState(
+          {
+            hasLoggedInOnce: authState.hasLoggedInOnce,
+            accessToken: newAuthState.accessToken || authState.accessToken,
+            accessTokenExpirationDate: newAuthState.accessTokenExpirationDate || authState.accessTokenExpirationDate,
+            refreshToken: newAuthState.refreshToken || authState.refreshToken,
+          }
+        )
+      },
+      (message) => {
+        console.log('User refused to refresh the token :', message)
+      }
+    ).catch(
+      (error) => {
+        console.log('Failed to refresh the token :', error)
+      }
+    )
+  }
+  const revokeAccount =
+    () => {
+      if (!authState.accessToken) { return }
+      revoke(config, { tokenToRevoke: authState.accessToken, sendClientId: true }).then(
+        () => {
+          setAuthState(
+            {
+              hasLoggedInOnce: authState.hasLoggedInOnce,
+              accessToken: '',
+              accessTokenExpirationDate: '',
+              refreshToken: '',
+            }
+          )
+        },
+        (message) => {
+          console.log('User refused to revoke the token :', message)
+        }
+      ).catch(
+        (error) => {
+          console.log('Failed to revoked the token :', error)
+        }
+      )
+    }
 
   return (
-    <SafeAreaView style={backgroundStyle}>
-      <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
-      <ScrollView
-        contentInsetAdjustmentBehavior="automatic"
-        style={backgroundStyle}>
-        <Header />
-        <View
-          style={{
-            backgroundColor: isDarkMode ? Colors.black : Colors.white,
-          }}>
-          <Section title="Step One">
-            Edit <Text style={styles.highlight}>App.tsx</Text> to change this
-            screen and then come back to see your edits.
-          </Section>
-          <Section title="See Your Changes">
-            <ReloadInstructions />
-          </Section>
-          <Section title="Debug">
-            <DebugInstructions />
-          </Section>
-          <Section title="Learn More">
-            Read the docs to discover what to do next:
-          </Section>
-          <LearnMoreLinks />
-        </View>
-      </ScrollView>
-    </SafeAreaView>
-  );
-};
+    <View style={styles.container}>
+      {!!authState.accessToken ? (
+        <Text>
+          Access token : {authState.accessToken}{"\n"}
+          Access token expiration date: {authState.accessTokenExpirationDate}{"\n"}
+          Refresh token: {authState.refreshToken}{"\n"}
+        </Text>
+      ) : (
+        <Text>{authState.hasLoggedInOnce ? "Goodbye" : "Hello"} </Text>
+      )
+      }
+      {!authState.accessToken && <Button title="Authorize" onPress={authorizeAccount} />}
+      {!!authState.refreshToken && <Button title="Refresh" onPress={refreshAccount} />}
+      {!!authState.accessToken && <Button title="Revoke" onPress={revokeAccount} />}
+    </View >
+  )
+}
+
+export default App;
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: 'azure',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   sectionContainer: {
     marginTop: 32,
     paddingHorizontal: 24,
@@ -134,5 +155,3 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
 });
-
-export default App;
