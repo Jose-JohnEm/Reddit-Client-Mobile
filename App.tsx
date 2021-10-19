@@ -1,13 +1,3 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * Generated with the TypeScript template
- * https://github.com/react-native-community/react-native-template-typescript
- *
- * @format
- */
-
 import React, { useState, useEffect } from 'react';
 import { Button, View, StatusBar, StyleSheet, Text } from 'react-native'
 import { authorize, refresh, revoke } from 'react-native-app-auth';
@@ -17,8 +7,8 @@ const config =
   redirectUrl: 'com.redditech.auth://oauth2redirect/reddit',
   clientId: 'J3wD24v0xSwSgWHTPsYMFg',
   clientSecret: '', // empty string - needed for iOS
-  scopes: ['identity'],
-  duration: "permanent",
+  scopes: ['identity identity edit flair history modconfig modflair modlog modposts modwiki mysubreddits privatemessages read report save submit subscribe vote wikiedit wikiread'],
+  duration: 'permanent',
   serviceConfiguration: {
     authorizationEndpoint: 'https://www.reddit.com/api/v1/authorize.compact',
     tokenEndpoint: 'https://www.reddit.com/api/v1/access_token',
@@ -26,8 +16,7 @@ const config =
   },
   customHeaders: {
     token: {
-      // Authorization: Buffer.from('J3wD24v0xSwSgWHTPsYMFg').toString('base64'),
-      Authorization: 'Basic <base64encoded clientID:>',
+      Authorization: 'SjN3RDI0djB4U3dTZ1dIVFBzWU1GZw==',
     },
   },
 };
@@ -53,7 +42,6 @@ const App = () => {
             refreshToken: newAuthState.refreshToken,
           }
         )
-        console.log(newAuthState)
       },
       (message) => {
         console.log('User refused to log in :', message)
@@ -112,17 +100,16 @@ const App = () => {
     <View style={styles.container}>
       {!!authState.accessToken ? (
         <Text>
-          Access token : {authState.accessToken}{"\n"}
-          Access token expiration date: {authState.accessTokenExpirationDate}{"\n"}
-          Refresh token: {authState.refreshToken}{"\n"}
+          Access token : {authState.accessToken}{'\n'}
+          Access token expiration date: {authState.accessTokenExpirationDate}{'\n'}
+          Refresh token: {authState.refreshToken}{'\n'}
         </Text>
       ) : (
-        <Text>{authState.hasLoggedInOnce ? "Goodbye" : "Hello"} </Text>
+        <Text>{authState.hasLoggedInOnce ? 'Goodbye' : 'Hello'} </Text>
       )
       }
-      {!authState.accessToken && <Button title="Authorize" onPress={authorizeAccount} />}
-      {!!authState.refreshToken && <Button title="Refresh" onPress={refreshAccount} />}
-      {!!authState.accessToken && <Button title="Revoke" onPress={revokeAccount} />}
+      {!authState.accessToken && <Button title='Authorize' onPress={authorizeAccount} />}
+      {!!authState.accessToken && <Button title='Revoke' onPress={revokeAccount} />}
     </View >
   )
 }
