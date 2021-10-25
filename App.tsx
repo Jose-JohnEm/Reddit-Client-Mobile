@@ -1,6 +1,9 @@
 import React from 'react';
 import { Button, View, StatusBar, StyleSheet, Text } from 'react-native'
 import { useAuth, ProvideAuth, useProvideAuth } from "./Auth"
+import './Profile'
+import './AppNavbar'
+import './Subreddit'
 
 const App = () => {
   return (
@@ -14,6 +17,24 @@ const App = () => {
 
 const loginPage = () => {
   const auth = useProvideAuth()
+
+  const connectUser = () => {
+
+    if (!!auth.state.accessToken) {
+      return(
+        // <SubReddit/>
+        <Profile />
+      )
+    } else {
+      return(
+        <View>
+          <View>
+            <Text>Hello</Text>
+          </View>
+        </View>
+      )
+    }
+  }
 
   return (
     <View style={styles.container}>
