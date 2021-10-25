@@ -1,116 +1,40 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Button, View, StatusBar, StyleSheet, Text } from 'react-native'
-import { authorize, refresh, revoke } from 'react-native-app-auth';
-
-const config =
-{
-  redirectUrl: 'com.redditech.auth://oauth2redirect/reddit',
-  clientId: 'J3wD24v0xSwSgWHTPsYMFg',
-  clientSecret: '', // empty string - needed for iOS
-  scopes: ['identity identity edit flair history modconfig modflair modlog modposts modwiki mysubreddits privatemessages read report save submit subscribe vote wikiedit wikiread'],
-  duration: 'permanent',
-  serviceConfiguration: {
-    authorizationEndpoint: 'https://www.reddit.com/api/v1/authorize.compact',
-    tokenEndpoint: 'https://www.reddit.com/api/v1/access_token',
-    revocationEndpoint: 'https://www.reddit.com/api/v1/revoke_token'
-  },
-  customHeaders: {
-    token: {
-      Authorization: 'SjN3RDI0djB4U3dTZ1dIVFBzWU1GZw==',
-    },
-  },
-};
+import { useAuth, ProvideAuth, useProvideAuth } from "./Auth"
 
 const App = () => {
-  const [authState, setAuthState] = useState(
-    {
-      hasLoggedInOnce: false,
-      accessToken: '',
-      accessTokenExpirationDate: '',
-      refreshToken: '',
-    }
+  return (
+    <ProvideAuth>
+      {
+        loginPage()
+      }
+    </ProvideAuth>
   )
+}
 
-  const authorizeAccount = () => {
-    authorize(config).then(
-      (newAuthState) => {
-        setAuthState(
-          {
-            hasLoggedInOnce: true,
-            accessToken: newAuthState.accessToken,
-            accessTokenExpirationDate: newAuthState.accessTokenExpirationDate,
-            refreshToken: newAuthState.refreshToken,
-          }
-        )
-      },
-      (message) => {
-        console.log('User refused to log in :', message)
-      }
-    ).catch(
-      (error) => {
-        console.log('Failed to log in :', error.message)
-      }
-    )
-  }
-  const refreshAccount = () => {
-    refresh(config, { refreshToken: authState.refreshToken }).then(
-      (newAuthState) => {
-        setAuthState(
-          {
-            hasLoggedInOnce: authState.hasLoggedInOnce,
-            accessToken: newAuthState.accessToken || authState.accessToken,
-            accessTokenExpirationDate: newAuthState.accessTokenExpirationDate || authState.accessTokenExpirationDate,
-            refreshToken: newAuthState.refreshToken || authState.refreshToken,
-          }
-        )
-      },
-      (message) => {
-        console.log('User refused to refresh the token :', message)
-      }
-    ).catch(
-      (error) => {
-        console.log('Failed to refresh the token :', error)
-      }
-    )
-  }
-  const revokeAccount =
-    () => {
-      revoke(config, { tokenToRevoke: authState.accessToken, sendClientId: true }).then(
-        () => {
-          setAuthState(
-            {
-              hasLoggedInOnce: authState.hasLoggedInOnce,
-              accessToken: '',
-              accessTokenExpirationDate: '',
-              refreshToken: '',
-            }
-          )
-        },
-        (message) => {
-          console.log('User refused to revoke the token :', message)
-        }
-      ).catch(
-        (error) => {
-          console.log('Failed to revoked the token :', error)
-        }
-      )
-    }
+const loginPage = () => {
+  const auth = useProvideAuth()
 
   return (
     <View style={styles.container}>
-      {!!authState.accessToken ? (
-        <Text>
-          Access token : {authState.accessToken}{'\n'}
-          Access token expiration date: {authState.accessTokenExpirationDate}{'\n'}
-          Refresh token: {authState.refreshToken}{'\n'}
-        </Text>
-      ) : (
-        <Text>{authState.hasLoggedInOnce ? 'Goodbye' : 'Hello'} </Text>
-      )
+      {
+        !!auth.state.accessToken ? (
+          <Text>
+            Access token : {auth.state.accessToken}{'\n'}
+            Refresh token: {auth.state.refreshToken}{'\n'}
+            Access token expiration date: {auth.state.accessTokenExpirationDate}{'\n'}
+          </Text>
+        ) : (
+          <Text>{auth.state.hasLoggedInOnce ? 'Goodbye' : 'Hello'} </Text>
+        )
       }
-      {!authState.accessToken && <Button title='Authorize' onPress={authorizeAccount} />}
-      {!!authState.accessToken && <Button title='Revoke' onPress={revokeAccount} />}
-    </View >
+      {
+        !auth.state.accessToken && <Button title='Authorize' onPress={auth.authorizeAccount} />
+      }
+      {
+        !!auth.state.accessToken && <Button title='Revoke' onPress={auth.revokeAccount} />
+      }
+    </View>
   )
 }
 
