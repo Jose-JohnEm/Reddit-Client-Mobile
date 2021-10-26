@@ -1,91 +1,45 @@
 import React from 'react';
-import { Button, View, StatusBar, StyleSheet, Text } from 'react-native'
-import { useAuth, ProvideAuth, useProvideAuth } from "./Auth"
+import { View, } from 'react-native'
 import Profile from './Profile';
-import AppNavbar from './AppNavbar';
 import SubReddit from './Subreddit';
-import { NavigationContainer } from '@react-navigation/native';
+import { useAuth, ProvideAuth } from "./Auth"
+import { Button, WhiteSpace, Flex } from '@ant-design/react-native';
 
 const App = () => {
   return (
     <ProvideAuth>
-      {
-        loginPage()
-      }
+      <LoginPage />
     </ProvideAuth>
   )
 }
 
-const loginPage = () => {
-  const auth = useProvideAuth()
+const LoginPage = () => {
+  const auth = useAuth()
 
-  const connectUser = () => {
-
-    if (!!auth.state.accessToken) {
-      return(
-        // <SubReddit/>
-        <Profile/>
-      )
-    } else {
-      return(
-        <View>
-          <View>
-            <Text>Hello</Text>
-          </View>
-        </View>
-      )
-    }
-  }
-
-  const display = () => {
+  const Display = () => {
     if (!!auth.state.accessToken) {
       return (
         <View>
-          <Button title='Revoke' onPress={auth.revokeAccount} />
-          <AppNavbar />
+          <Profile />
+          <WhiteSpace />
+          <Button type="primary" onPress={auth.revokeAccount}>Revoke</Button>
         </View>
       )
     } else {
       return (
         <View>
-          <Button title='Authorize' onPress={auth.authorizeAccount} />
+          <WhiteSpace />
+          <Button type="primary" onPress={auth.authorizeAccount}>Authorize</Button>
         </View>
       )
     }
   }
 
   return (
-    <NavigationContainer>
-      <View style={styles.container}>
-        {display()}
-      </View>
-    </NavigationContainer>
+    <View>
+      <Flex justify="center"><Display /></Flex>
+    </View >
   )
 }
 
 export default App;
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: 'azure',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  sectionContainer: {
-    marginTop: 32,
-    paddingHorizontal: 24,
-  },
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: '600',
-  },
-  sectionDescription: {
-    marginTop: 8,
-    fontSize: 18,
-    fontWeight: '400',
-  },
-  highlight: {
-    fontWeight: '700',
-  },
-});
