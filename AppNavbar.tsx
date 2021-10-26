@@ -1,27 +1,20 @@
 import * as React from 'react';
 import { BottomNavigation, Text } from 'react-native-paper';
+import SubReddit from './Subreddit';
+import Profile from './Profile';
 
-const Accueil = () => <Text>Acceuil</Text>
-const Profil = () => <Text>Profil</Text>
+import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
+import { NavigationContainer } from '@react-navigation/native';
+const Tab = createMaterialBottomTabNavigator();
 
-const AppNavbar = () => {
-  const [index, setIndex] = React.useState(0);
-  const [routes] = React.useState([
-    { key: 'main', title: 'Accueil', icon: 'home' },
-    { key: 'profile', title: 'Profil', icon: 'human-male' },
-  ]);
 
-  const renderScene = BottomNavigation.SceneMap({
-    main: Accueil,
-    profile: Profil
-  })
+const AppNavbar : React.FC = () => {
 
-  return(
-    <BottomNavigation
-        navigationState={{index, routes}}
-        onIndexChange={setIndex}
-        renderScene={renderScene}
-    />
+  return (
+    <Tab.Navigator>
+      <Tab.Screen name="Acceuil" component={SubReddit} />
+      <Tab.Screen name="Profil" component={Profile} />
+    </Tab.Navigator>
   )
 }
 

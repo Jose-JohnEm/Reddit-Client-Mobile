@@ -29,7 +29,7 @@ function fetchOAuth(url : string) : Promise<Response> {
     )
 }
 
-const SubReddit : React.FC = () => {
+const SubReddit = () => {
     const [search, setSearch] = useState('')
     const [searching, setSearching] = useState(false)
     const [subreddit, setSubreddit] = useState(

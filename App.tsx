@@ -1,9 +1,10 @@
 import React from 'react';
 import { Button, View, StatusBar, StyleSheet, Text } from 'react-native'
 import { useAuth, ProvideAuth, useProvideAuth } from "./Auth"
-import './Profile'
-import './AppNavbar'
-import './Subreddit'
+import Profile from './Profile';
+import AppNavbar from './AppNavbar';
+import SubReddit from './Subreddit';
+import { NavigationContainer } from '@react-navigation/native';
 
 const App = () => {
   return (
@@ -23,7 +24,7 @@ const loginPage = () => {
     if (!!auth.state.accessToken) {
       return(
         // <SubReddit/>
-        <Profile />
+        <Profile/>
       )
     } else {
       return(
@@ -36,26 +37,29 @@ const loginPage = () => {
     }
   }
 
+  const display = () => {
+    if (!!auth.state.accessToken) {
+      return (
+        <View>
+          <Button title='Revoke' onPress={auth.revokeAccount} />
+          <AppNavbar />
+        </View>
+      )
+    } else {
+      return (
+        <View>
+          <Button title='Authorize' onPress={auth.authorizeAccount} />
+        </View>
+      )
+    }
+  }
+
   return (
-    <View style={styles.container}>
-      {
-        !!auth.state.accessToken ? (
-          <Text>
-            Access token : {auth.state.accessToken}{'\n'}
-            Refresh token: {auth.state.refreshToken}{'\n'}
-            Access token expiration date: {auth.state.accessTokenExpirationDate}{'\n'}
-          </Text>
-        ) : (
-          <Text>{auth.state.hasLoggedInOnce ? 'Goodbye' : 'Hello'} </Text>
-        )
-      }
-      {
-        !auth.state.accessToken && <Button title='Authorize' onPress={auth.authorizeAccount} />
-      }
-      {
-        !!auth.state.accessToken && <Button title='Revoke' onPress={auth.revokeAccount} />
-      }
-    </View>
+    <NavigationContainer>
+      <View style={styles.container}>
+        {display()}
+      </View>
+    </NavigationContainer>
   )
 }
 

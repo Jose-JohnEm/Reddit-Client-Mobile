@@ -10,7 +10,7 @@ function fetchOAuth(url : string) : Promise<Response> {
     )
 }
 
-const Profile : React.FC = () => {
+const Profile = () => {
     const [profileData, setProfileData] = useState(
         {
             name: '',
