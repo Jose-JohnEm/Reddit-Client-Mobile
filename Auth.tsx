@@ -1,4 +1,4 @@
-import React, { useState, useEffect, createContext, useContext } from "react";
+import React, { useState, createContext, useContext } from "react";
 import { authorize, revoke } from 'react-native-app-auth';
 
 const config =
@@ -43,7 +43,7 @@ export const useAuth = () => {
 };
 
 
-export function useProvideAuth() {
+function useProvideAuth() {
   const [state, setState] = useState(
     {
       hasLoggedInOnce: false,
@@ -96,17 +96,6 @@ export function useProvideAuth() {
       }
     )
   }
-
-  // useEffect(() => {
-  //   setState(
-  //     {
-  //       hasLoggedInOnce: state.hasLoggedInOnce,
-  //       accessToken: state.accessToken,
-  //       accessTokenExpirationDate: state.accessTokenExpirationDate,
-  //       refreshToken: state.refreshToken
-  //     }
-  //   )
-  // }, [])
 
   return {
     state,
