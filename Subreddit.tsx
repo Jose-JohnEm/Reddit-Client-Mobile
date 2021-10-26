@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { SafeAreaView, TextInput, Button, View, StyleSheet, Text, Image } from 'react-native'
+import { SafeAreaView, TextInput, View, StyleSheet, Text, Image } from 'react-native'
 import { useAuth } from './Auth';
+import { Button, SearchBar } from '@ant-design/react-native';
 
 const styles = StyleSheet.create({
   baseText: {
@@ -35,8 +36,8 @@ function fetchOAuth(url: string): Promise<Response> {
 }
 
 const SubReddit = () => {
-  const [search, setSearch] = useState('')
-  const [searching, setSearching] = useState(false)
+  const [input, setInput] = useState("")
+  const [buttonClicked, setButtonClicked] = useState(false)
   const [subreddit, setSubreddit] = useState(
     {
       name: '',
@@ -48,8 +49,8 @@ const SubReddit = () => {
   )
 
 
-  function getSubreddit(name: string): void {
-    fetchOAuth('https://oauth.reddit.com/r/' + name + '/about/.json?raw_json=1')
+  const getSubreddit = () => {
+    fetchOAuth('https://oauth.reddit.com/r/' + input + '/about/.json?raw_json=1')
       .then(response => response.json())
       .then((json) => {
         setSubreddit({
@@ -62,8 +63,9 @@ const SubReddit = () => {
       }).catch(error => console.error(error))
   }
 
-  function renderWithSubreddit() {
-    if (searching)
+  const RenderWithSubreddit = () => {
+    if (buttonClicked) {
+      getSubreddit()
       return (
         <View>
           <Image source={{ uri: subreddit.bg_uri }} />
@@ -72,22 +74,30 @@ const SubReddit = () => {
           <Text style={styles.comment}>{subreddit.description}</Text>
         </View>
       )
+    } else
+      return <View />
   }
+
 
   return (
     <View>
-      <SafeAreaView>
-        <TextInput
-          style={styles.input}
-          onChangeText={(text) => { setSearch(text); setSearching(false) }}
-          value={search}
-        />
-        <Button
-          title="Search"
-          onPress={() => { getSubreddit(search); setSearching(true) }}
-        />
-      </SafeAreaView>
-      {renderWithSubreddit()}
+      <SearchBar
+        value={input}
+        placeholder="Search for subreddit"
+        onSubmit={
+          () => {
+            setButtonClicked(true);
+          }
+        }
+        onChange={
+          (input) => setInput(input)
+        }
+        onCancel={
+          () => setInput("")
+        }
+        cancelText="X"
+      />
+      <RenderWithSubreddit />
     </View>
   )
 }

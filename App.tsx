@@ -22,6 +22,7 @@ const LoginPage = () => {
         <View>
           <Profile />
           <WhiteSpace />
+          <SubReddit />
           <Button type="primary" onPress={auth.revokeAccount}>Revoke</Button>
         </View>
       )
@@ -37,7 +38,7 @@ const LoginPage = () => {
 
   return (
     <View>
-      <Flex justify="center"><Display /></Flex>
+      <Display />
     </View >
   )
 }
