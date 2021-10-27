@@ -27,9 +27,9 @@ const Profile = () => {
               {
                 name: parsed.name,
                 description: parsed.subreddit.public_description,
-                pdp_uri: parsed.icon_img,
+                pdp_uri: parsed.icon_img.split('?')[0],
                 nb_friends: parsed.num_friends,
-                banner_uri: parsed.subreddit.banner_img,//.split('?')[0],
+                banner_uri: parsed.subreddit.banner_img.split('?')[0],
                 color: parsed.subreddit.icon_color,
                 coins: parsed.coins,
                 karma: parsed.total_karma
@@ -43,12 +43,11 @@ const Profile = () => {
       )
   }
 
-  if (auth.state.accessToken) { getProfile() }
-
+  //if (auth.state.accessToken) { getProfile() }
+  getProfile()
   return (
     <View>
         <WingBlank size="lg">
-            <Image source={{ uri: profileData.banner_uri }}/>
             <Card>
             <Card.Header
                 title={profileData.name}
