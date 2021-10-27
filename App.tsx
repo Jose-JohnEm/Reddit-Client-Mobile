@@ -1,49 +1,80 @@
 import React from 'react';
-import { View, } from 'react-native'
+import { View, Text, Dimensions, StyleSheet } from 'react-native'
 import Profile from './Profile';
 import SubReddit from './Subreddit';
 import { useAuth, ProvideAuth } from "./Auth"
-import { Button, WhiteSpace, Flex } from '@ant-design/react-native';
+import { Button, Flex, Tabs, WhiteSpace, WingBlank } from '@ant-design/react-native';
 
 const App = () => {
   return (
     <ProvideAuth>
-      <LoginPage />
+      <WelcomePage />
     </ProvideAuth>
   )
 }
 
+const styles = StyleSheet.create(
+  {
+    tab:
+    {
+      alignItems: 'center',
+      justifyContent: 'center',
+      height: Dimensions.get('window').height,
+      backgroundColor: '#fff',
+    }
+  }
+)
+
 const LoginPage = () => {
   const auth = useAuth()
 
-  const Display = () => {
-    if (!!auth.state.accessToken) {
-      return (
-        <View>
-          <View>
-            <Profile />
-            <WhiteSpace />
-          </View>
-          <View>
-          <Flex justify="center"><Button type="primary" onPress={auth.revokeAccount}>Disconnect</Button></Flex>
-          </View>
-        </View>
-      )
-    } else {
-      return (
-        <View>
-          <WhiteSpace />
-          <Flex justify="center"><Button type="primary" onPress={auth.authorizeAccount}>Connect</Button></Flex>
-        </View>
-      )
-    }
-  }
-
   return (
-    <View>
-      <Display />
+    < View style={{ flexGrow: 1, justifyContent: 'center' }}>
+      <Text style={{ textAlign: 'center' }}>
+        Hello, you are not logged in. Please click the button bellow
+      </Text>
+      <WhiteSpace />
+      <WingBlank>
+        <Button type="primary" onPress={auth.authorizeAccount}>Log in with reddit</Button>
+      </WingBlank>
     </View >
   )
+}
+
+const HomePage = () => {
+  const tabs =
+    [
+      { title: 'Subreddit' },
+      { title: 'Profile' },
+      { title: 'Settings' }
+    ]
+
+  return (
+    <View style={{ flex: 1 }}>
+      <Tabs tabs={tabs}>
+        <View style={styles.tab}>
+          <Text>Subreddit</Text>
+        </View>
+        <View style={styles.tab}>
+          <Text>Profile</Text>
+        </View>
+        <View style={styles.tab}>
+          <Text>Settings</Text>
+        </View>
+      </Tabs>
+    </View >
+  )
+}
+
+
+const WelcomePage = () => {
+  const auth = useAuth()
+
+  if (!!auth.state.accessToken) {
+    return <HomePage />
+  } else {
+    return <LoginPage />
+  }
 }
 
 export default App;

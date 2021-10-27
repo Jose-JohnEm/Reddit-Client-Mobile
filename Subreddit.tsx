@@ -22,22 +22,9 @@ const styles = StyleSheet.create({
   },
 });
 
-function fetchOAuth(url: string): Promise<Response> {
-  const auth = useAuth()
-
-  return fetch(
-    url,
-    {
-      headers: {
-        "Authorization": 'bearer ' + auth.state.accessToken,
-      }
-    }
-  )
-}
-
 const SubReddit = () => {
+  const auth = useAuth()
   const [input, setInput] = useState("")
-  const [buttonClicked, setButtonClicked] = useState(false)
   const [subreddit, setSubreddit] = useState(
     {
       name: '',
@@ -50,34 +37,54 @@ const SubReddit = () => {
 
 
   const getSubreddit = () => {
-    fetchOAuth('https://oauth.reddit.com/r/' + input + '/about/.json?raw_json=1')
-      .then(response => response.json())
-      .then((json) => {
-        setSubreddit({
-          name: json.data.display_name,
-          title: json.data.title,
-          description: json.data.public_description,
-          icon_uri: json.data.community_icon,
-          bg_uri: json.data.banner_background_image,
-        })
-      }).catch(error => console.error(error))
+    fetch(
+      'https://oauth.reddit.com/r/' + input + '/about/.json?raw_json=1',
+      {
+        headers: {
+          "Authorization": 'bearer ' + auth.state.accessToken,
+        }
+      }
+    ).then(
+      response => response.json()
+    ).then(
+      (json) => {
+        setSubreddit(
+          {
+            name: json.data.display_name,
+            title: json.data.title,
+            description: json.data.public_description,
+            icon_uri: json.data.community_icon,
+            bg_uri: json.data.banner_background_image,
+          }
+        )
+      }
+    ).catch(
+      (error) => {
+        console.log(error)
+        setSubreddit(
+          {
+            name: '',
+            title: '',
+            description: '',
+            icon_uri: '',
+            bg_uri: '',
+          }
+        )
+      }
+    )
   }
 
-  const RenderWithSubreddit = () => {
-    if (buttonClicked) {
-      getSubreddit()
-      return (
-        <View>
-          <Image source={{ uri: subreddit.bg_uri }} />
-          <Text style={styles.baseText}>{subreddit.title}</Text>
-          <Text style={styles.middleText}>{subreddit.name}</Text>
-          <Text style={styles.comment}>{subreddit.description}</Text>
-        </View>
-      )
-    } else
-      return <View />
-  }
+  const RenderSubreddit = ({ subreddit }: { subreddit: any }) => {
 
+    return (
+      <View>
+        <Image source={{ uri: subreddit.bg_uri }} />
+        <Text style={styles.baseText}>{subreddit.title}</Text>
+        <Text style={styles.middleText}>{subreddit.name}</Text>
+        <Text style={styles.comment}>{subreddit.description}</Text>
+      </View>
+    )
+  }
 
   return (
     <View>
@@ -85,9 +92,7 @@ const SubReddit = () => {
         value={input}
         placeholder="Search for subreddit"
         onSubmit={
-          () => {
-            setButtonClicked(true);
-          }
+          () => getSubreddit()
         }
         onChange={
           (input) => setInput(input)
@@ -97,7 +102,7 @@ const SubReddit = () => {
         }
         cancelText="X"
       />
-      <RenderWithSubreddit />
+      {subreddit ? <RenderSubreddit subreddit={subreddit} /> : null}
     </View>
   )
 }
