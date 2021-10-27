@@ -23,9 +23,9 @@ const Profile = () => {
     {
       name: '',
       description: '',
-      pdp_uri: '',
+      pdp_uri: 'https://www.elementaryos-fr.org/wp-content/uploads/2019/08/logo-reddit.png',
       nb_friends: 0,
-      banner_uri: '',
+      banner_uri: 'https://www.elementaryos-fr.org/wp-content/uploads/2019/08/logo-reddit.png',
       color: '',
       coins: 0,
       karma: 0
@@ -43,7 +43,7 @@ const Profile = () => {
                 description: parsed.subreddit.public_description,
                 pdp_uri: parsed.icon_img,
                 nb_friends: parsed.num_friends,
-                banner_uri: parsed.subreddit.banner_img.split('?')[0],
+                banner_uri: parsed.subreddit.banner_img,//.split('?')[0],
                 color: parsed.subreddit.icon_color,
                 coins: parsed.coins,
                 karma: parsed.total_karma
