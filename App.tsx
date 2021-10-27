@@ -20,16 +20,20 @@ const LoginPage = () => {
     if (!!auth.state.accessToken) {
       return (
         <View>
-          <Profile />
-          <WhiteSpace />
-          <Button type="primary" onPress={auth.revokeAccount}>Revoke</Button>
+          <View>
+            <Profile />
+            <WhiteSpace />
+          </View>
+          <View>
+          <Flex justify="center"><Button type="primary" onPress={auth.revokeAccount}>Disconnect</Button></Flex>
+          </View>
         </View>
       )
     } else {
       return (
         <View>
           <WhiteSpace />
-          <Button type="primary" onPress={auth.authorizeAccount}>Authorize</Button>
+          <Flex justify="center"><Button type="primary" onPress={auth.authorizeAccount}>Connect</Button></Flex>
         </View>
       )
     }
@@ -37,7 +41,7 @@ const LoginPage = () => {
 
   return (
     <View>
-      <Flex justify="center"><Display /></Flex>
+      <Display />
     </View >
   )
 }
