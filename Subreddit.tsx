@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { SafeAreaView, TextInput, View, StyleSheet, Text, Image } from 'react-native'
-import { useAuth } from './Auth';
 import { Button, SearchBar } from '@ant-design/react-native';
+import fetchOAuth from './Fetchoauth';
 
 const styles = StyleSheet.create({
   baseText: {
@@ -21,19 +21,6 @@ const styles = StyleSheet.create({
     padding: 10,
   },
 });
-
-function fetchOAuth(url: string): Promise<Response> {
-  const auth = useAuth()
-
-  return fetch(
-    url,
-    {
-      headers: {
-        "Authorization": 'bearer ' + auth.state.accessToken,
-      }
-    }
-  )
-}
 
 const SubReddit = () => {
   const [input, setInput] = useState("")

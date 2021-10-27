@@ -1,24 +1,10 @@
 import React, { useState } from 'react';
 import { View, Text, Image } from 'react-native'
-import { useAuth } from './Auth';
 import { Card, WhiteSpace, WingBlank } from '@ant-design/react-native';
+import fetchOAuth from './Fetchoauth'
 
-function fetchOAuth(url: string): Promise<Response> {
-  const auth = useAuth()
-
-  return fetch(
-    url,
-    {
-      headers:
-      {
-        "Authorization": 'bearer ' + auth.state.accessToken,
-      }
-    }
-  )
-}
 
 const Profile = () => {
-  const auth = useAuth()
   const [profileData, setProfileData] = useState(
     {
       name: '',
