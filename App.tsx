@@ -1,72 +1,85 @@
 import React, { useState } from 'react';
-import { View, } from 'react-native'
-import Profile from './Profile';
+import { ScrollView ,View, Text, Dimensions, StyleSheet } from 'react-native'
+import { Button, Flex, SearchBar,Tabs, WhiteSpace, WingBlank } from '@ant-design/react-native';
 import { useAuth, ProvideAuth } from "./Auth"
-import { Button, WhiteSpace, Flex } from '@ant-design/react-native';
 import SubPost from './SubPost'
-import { SearchBar } from '@ant-design/react-native';
-import SubReddit from './Subreddit';
+import {SubReddit, SubRedditSearch} from './Subreddit';
+import Profile from './Profile';
 
 const App = () => {
   return (
     <ProvideAuth>
-      <LoginPage />
+      <WelcomePage />
     </ProvideAuth>
   )
 }
 
-const LoginPage = () => {
-  const auth = useAuth()
-  const [input, setInput] = useState("")
-  const [search, setSearch] = useState("")
-
-  const Display = () => {
-    if (!!auth.state.accessToken) {
-      return (
-        <View>
-          {/* <View>
-            <Profile />
-            <WhiteSpace />
-          </View> */}
-          <View>
-            <SearchBar
-              value={input}
-              placeholder="Search for subreddit"
-              onSubmit={
-                () => {
-                  setSearch(input)
-                }
-              }
-              onChange={
-                (input) => setInput(input)
-              }
-              onCancel={
-                () => setInput("")
-              }
-              cancelText="X"
-            />
-
-            <SubReddit subredditName={search} />
-
-            <Flex justify="center"><Button type="ghost" onPress={auth.revokeAccount}>Se déconnecter</Button></Flex>
-          </View>
-        </View>
-      )
-    } else {
-      return (
-        <View>
-          <WhiteSpace />
-          <Flex justify="center"><Button type="primary" onPress={auth.authorizeAccount}>Connect</Button></Flex>
-        </View>
-      )
+const styles = StyleSheet.create(
+  {
+    tab:
+    {
+      alignItems: 'center',
+      justifyContent: 'center',
+      height: Dimensions.get('window').height,
+      backgroundColor: '#fff',
     }
   }
+)
+
+const LoginPage = () => {
+  const auth = useAuth()
 
   return (
-    <View>
-      <Display />
+    < View style={{ flexGrow: 1, justifyContent: 'center' }}>
+      <Text style={{ textAlign: 'center' }}>
+        Hello, you are not logged in. Please click the button bellow
+      </Text>
+      <WhiteSpace />
+      <WingBlank>
+        <Button type="primary" onPress={auth.authorizeAccount}>Log in with reddit</Button>
+      </WingBlank>
     </View >
   )
+}
+
+const HomePage = () => {
+  const auth = useAuth()
+  const tabs =
+    [
+      {title:'Home'},
+      { title: 'Search' },
+      { title: 'Profile' },
+      { title: 'Settings' }
+    ]
+
+  return (
+    <View style={{ flex: 1 }}>
+      <Tabs tabs={tabs}>
+        <ScrollView>
+          <SubReddit />
+        </ScrollView>
+        <ScrollView>
+          <SubRedditSearch/>
+        </ScrollView>
+        <View>
+          <Profile />
+        </View>
+        <View style={styles.tab}>
+          <Button type="ghost" onPress={auth.revokeAccount}>Logout</Button>
+        </View>
+      </Tabs>
+    </View >
+  )
+}
+
+const WelcomePage = () => {
+  const auth = useAuth()
+
+  if (!!auth.state.accessToken) {
+    return <HomePage />
+  } else {
+    return <LoginPage />
+  }
 }
 
 export default App;

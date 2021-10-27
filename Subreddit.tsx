@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { SafeAreaView, TextInput, View, StyleSheet, Text, Image } from 'react-native'
-import { Button, SearchBar } from '@ant-design/react-native';
+import { View, StyleSheet, Text, Image } from 'react-native'
 import fetchOAuth from './Fetchoauth';
 import SubPost from './SubPost';
+import { Button, Flex, SearchBar,Tabs, WhiteSpace, WingBlank } from '@ant-design/react-native';
 
 const styles = StyleSheet.create({
   baseText: {
@@ -23,11 +23,8 @@ const styles = StyleSheet.create({
   },
 });
 
-export type SRprops = {
-  subredditName?: string
-}
 
-const SubReddit : React.FC<SRprops> = ({subredditName = ''}) => {
+export const SubReddit = ({subredditName = ''}) => {
   const [postList, setPostList] = useState([])
   const [subreddit, setSubreddit] = useState(
     {
@@ -38,25 +35,6 @@ const SubReddit : React.FC<SRprops> = ({subredditName = ''}) => {
       bg_uri: '',
     }
   )
-
-  // const [postData, setPostData] = useState({
-  //   subreddit: '',
-  //   author: '',
-  //   title: '',
-  //   score: 0,
-  //   selftext: '',
-  // })
-
-  // const getSubPosts = () => {
-  //     setPostData({
-  //         subreddit: parsed.data.subreddit,
-  //         author: parsed.data.author,
-  //         title: parsed.data.title,
-  //         selftext: parsed.data.selftext,
-  //         score: parsed.data.score,
-  //     })
-  // }
-
 
   const getSubredditPosts = () => {
     const uri = (subredditName) ? `https://oauth.reddit.com/r/${subredditName}` : 'https://oauth.reddit.com'
@@ -71,55 +49,78 @@ const SubReddit : React.FC<SRprops> = ({subredditName = ''}) => {
     fetchOAuth(`https://oauth.reddit.com/r/${subredditName}/about`)
       .then(response => response.json())
       .then((json) => {
-        setSubreddit({
+        setSubreddit(
+          {
           name: json.data.display_name,
           title: json.data.title,
           description: json.data.public_description,
           icon_uri: json.data.community_icon,
           bg_uri: json.data.banner_background_image,
-        })
-      }).catch(error => console.error(error))
+        }
+        )
+      }
+      ).catch(error => console.error(error))
   }
 
   const RenderSubPosts = () => {
+    getSubredditPosts()
+
     return (
       <View>
-        {postList.map(sPost => {
-          return (
-            <View>
-              <SubPost key={sPost} parsed={sPost}/>
-            </View>
-          )
-        })}
+      {postList.map(
+            sPost => {
+              return (
+                <SubPost key={sPost} parsed={sPost}/>
+              )
+            }
+          )}
       </View>
     )
 
   }
 
   const RenderSubredditData = () => {
-    if (subredditName) {
-      return (
-        <View>
-          <Image source={{ uri: subreddit.bg_uri }} />
-          <Text style={styles.baseText}>{subreddit.title}</Text>
-          <Text style={styles.middleText}>{subreddit.name}</Text>
-          <Text style={styles.comment}>{subreddit.description}</Text>
-        </View>
-      )
-    } else {
-      return <View/>
-    }
+    getSubredditData()
+
+    return (
+      <View>
+        <Image source={{ uri: subreddit.bg_uri }} />
+        <Text style={styles.baseText}>{subreddit.title}</Text>
+        <Text style={styles.middleText}>{subreddit.name}</Text>
+        <Text style={styles.comment}>{subreddit.description}</Text>
+      </View>
+    )
   }
 
-  if (subredditName)
-    getSubredditData()
-  getSubredditPosts()
   return (
     <View>
-      <RenderSubredditData/>
+      {subredditName ? <RenderSubredditData /> : null}
       <RenderSubPosts />
     </View>
   )
 }
 
-export default SubReddit;
+export const SubRedditSearch = () => {
+  const [input, setInput] = useState("")
+  const [subreddit, setSubreddit] = useState("")
+
+  return (
+    <View>
+      <SearchBar
+      value={input}
+      placeholder="Search for subreddit"
+      onSubmit={
+        () => setSubreddit(input)
+      }
+      onChange={
+        (input) => setInput(input)
+      }
+      onCancel={
+        () => setInput("")
+      }
+      cancelText="X"
+      />
+      {subreddit ? <SubReddit subredditName={subreddit}/> : null}
+    </View>
+  )
+}
