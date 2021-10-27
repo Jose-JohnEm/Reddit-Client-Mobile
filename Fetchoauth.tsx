@@ -1,6 +1,6 @@
 import { useAuth } from './Auth';
 
-function fetchOAuth(url: string): Promise<Response> {
+const fetchOAuth = (url: string) => {
     const auth = useAuth()
 
     return fetch(
