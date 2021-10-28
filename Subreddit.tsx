@@ -32,7 +32,7 @@ export const SubReddit = ({subredditName = ''}) => {
       title: '',
       description: '',
       icon_uri: '',
-      bg_uri: '',
+      bg_uri: 'https://www.elementaryos-fr.org/wp-content/uploads/2019/08/logo-reddit.png',
     }
   )
 
@@ -63,14 +63,17 @@ export const SubReddit = ({subredditName = ''}) => {
   }
 
   const RenderSubPosts = () => {
-    getSubredditPosts()
+    if (!postList.length) {
+      getSubredditPosts()
+    }
+    let i = 0;
 
     return (
       <View>
       {postList.map(
             sPost => {
               return (
-                <SubPost key={sPost} parsed={sPost}/>
+                <SubPost key={i++} parsed={sPost}/>
               )
             }
           )}
@@ -80,7 +83,9 @@ export const SubReddit = ({subredditName = ''}) => {
   }
 
   const RenderSubredditData = () => {
-    getSubredditData()
+    if (!postList.length) {
+      getSubredditData()
+    }
 
     return (
       <View>

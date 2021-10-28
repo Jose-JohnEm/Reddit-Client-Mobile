@@ -16,7 +16,7 @@ const styles = StyleSheet.create({
 });
 
 const SubPost : React.FC<SPprops> = ({ parsed }) => {
-    const [subredditPic, setSubredditPic] = useState()
+    const [subredditPic, setSubredditPic] = useState('https://www.elementaryos-fr.org/wp-content/uploads/2019/08/logo-reddit.png')
     const getSubredditPic = () => {
         fetchOAuth(`https://oauth.reddit.com/r/${parsed.data.subreddit}/about/`)
         .then((response) => response.json())
