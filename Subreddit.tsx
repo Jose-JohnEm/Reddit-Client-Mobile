@@ -59,7 +59,10 @@ const filterStyle = StyleSheet.create({
 });
 
 export const SubReddit = ({subredditName = ''}) => {
-  const [postList, setPostList] = useState([])
+  const [hotpostList, setHotPostList] = useState([])
+  const [newpostList, setNewPostList] = useState([])
+  const [randompostList, setRandomPostList] = useState([])
+  const [filterIdx, setFilterIdx] = useState(0)
   const [subreddit, setSubreddit] = useState(
     {
       name: '',
@@ -70,23 +73,41 @@ export const SubReddit = ({subredditName = ''}) => {
     }
   )
 
+  const primOrGhost = (filter : number) => {
+    return (filter == filterIdx) ? 'primary' : 'ghost'
+  }
+
   const FilterButtonGroup = () => {
 
       return (
           <View style={filterStyle.filterButton}>
-              <Button type={primOrGohst(0)} style={filterStyle.leftButton} onPress={() => {setFilterIdx(0)}} >Hot</Button>
-              <Button type={primOrGohst(1)} style={filterStyle.midButton} onPress={() => {setFilterIdx(1)}} >New</Button>
-              <Button type={primOrGohst(2)} style={filterStyle.rightButton} onPress={() => {setFilterIdx(2)}} >Random</Button>
+              <Button type={primOrGhost(0)} style={filterStyle.leftButton} onPress={() => {setFilterIdx(0)}} >Hot</Button>
+              <Button type={primOrGhost(1)} style={filterStyle.midButton} onPress={() => {setFilterIdx(1)}} >New</Button>
+              <Button type={primOrGhost(2)} style={filterStyle.rightButton} onPress={() => {setFilterIdx(2)}} >Random</Button>
           </View>
       )
   }
 
   const getSubredditPosts = () => {
-    const uri = (subredditName) ? `https://oauth.reddit.com/r/${subredditName}` : 'https://oauth.reddit.com'
+    let uri = (subredditName) ? `https://oauth.reddit.com/r/${subredditName}/hot` : 'https://oauth.reddit.com/hot'
     fetchOAuth(uri)
       .then(response => response.json())
       .then((json) => {
-        setPostList(json.data.children)
+        setHotPostList(json.data.children)
+      }).catch(error => console.error(error))
+
+    uri = (subredditName) ? `https://oauth.reddit.com/r/${subredditName}/new` : 'https://oauth.reddit.com/new'
+    fetchOAuth(uri)
+      .then(response => response.json())
+      .then((json) => {
+        setNewPostList(json.data.children)
+      }).catch(error => console.error(error))
+
+    uri = (subredditName) ? `https://oauth.reddit.com/r/${subredditName}/random` : 'https://oauth.reddit.com/random'
+    fetchOAuth(uri)
+      .then(response => response.json())
+      .then((json) => {
+        setRandomPostList(json[0].data.children)
       }).catch(error => console.error(error))
   }
 
@@ -108,14 +129,14 @@ export const SubReddit = ({subredditName = ''}) => {
   }
 
   const RenderSubPosts = () => {
-    if (!postList.length) {
+    if (!hotpostList.length) {
       getSubredditPosts()
     }
     let i = 0;
 
     return (
       <View>
-      {postList.map(
+      {hotpostList.map(
             sPost => {
               return (
                 <SubPost key={i++} parsed={sPost}/>
@@ -128,7 +149,7 @@ export const SubReddit = ({subredditName = ''}) => {
   }
 
   const RenderSubredditData = () => {
-    if (!postList.length) {
+    if (!hotpostList.length) {
       getSubredditData()
     }
 
@@ -145,6 +166,7 @@ export const SubReddit = ({subredditName = ''}) => {
   return (
     <View>
       {subredditName ? <RenderSubredditData /> : null}
+      <FilterButtonGroup />
       <RenderSubPosts />
     </View>
   )
