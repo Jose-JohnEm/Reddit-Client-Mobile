@@ -21,8 +21,42 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     padding: 10,
   },
+  filterButton: {
+    margin: 10,
+    alignContent: 'space-between',
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+  }
 });
 
+const filterStyle = StyleSheet.create({
+    filterButton: {
+        margin: 10,
+        alignContent: 'space-between',
+        flex: 1,
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    leftButton: {
+        borderTopLeftRadius: 30,
+        borderBottomLeftRadius: 30,
+        borderTopRightRadius: 0,
+        borderBottomRightRadius: 0,
+    },
+    midButton: {
+        borderRadius: 0,
+
+    },
+    rightButton: {
+        borderTopLeftRadius: 0,
+        borderBottomLeftRadius: 0,
+        borderTopRightRadius: 30,
+        borderBottomRightRadius: 30,
+    }
+});
 
 export const SubReddit = ({subredditName = ''}) => {
   const [postList, setPostList] = useState([])
@@ -35,6 +69,17 @@ export const SubReddit = ({subredditName = ''}) => {
       bg_uri: 'https://www.elementaryos-fr.org/wp-content/uploads/2019/08/logo-reddit.png',
     }
   )
+
+  const FilterButtonGroup = () => {
+
+      return (
+          <View style={filterStyle.filterButton}>
+              <Button type={primOrGohst(0)} style={filterStyle.leftButton} onPress={() => {setFilterIdx(0)}} >Hot</Button>
+              <Button type={primOrGohst(1)} style={filterStyle.midButton} onPress={() => {setFilterIdx(1)}} >New</Button>
+              <Button type={primOrGohst(2)} style={filterStyle.rightButton} onPress={() => {setFilterIdx(2)}} >Random</Button>
+          </View>
+      )
+  }
 
   const getSubredditPosts = () => {
     const uri = (subredditName) ? `https://oauth.reddit.com/r/${subredditName}` : 'https://oauth.reddit.com'
