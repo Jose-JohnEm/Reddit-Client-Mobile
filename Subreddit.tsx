@@ -134,17 +134,46 @@ export const SubReddit = ({subredditName = ''}) => {
     }
     let i = 0;
 
-    return (
-      <View>
-      {hotpostList.map(
-            sPost => {
-              return (
-                <SubPost key={i++} parsed={sPost}/>
-              )
-            }
-          )}
-      </View>
-    )
+    if (filterIdx == 0) {
+      return (
+        <View>
+        {hotpostList.map(
+              sPost => {
+                return (
+                  <SubPost key={i++} parsed={sPost}/>
+                )
+              }
+            )}
+        </View>
+      )
+    }
+    if (filterIdx == 1) {
+      return (
+        <View>
+        {newpostList.map(
+              sPost => {
+                return (
+                  <SubPost key={i++} parsed={sPost}/>
+                )
+              }
+            )}
+        </View>
+      )
+    }
+    if (filterIdx == 2) {
+      return (
+        <View>
+        {randompostList.map(
+              sPost => {
+                return (
+                  <SubPost key={i++} parsed={sPost}/>
+                )
+              }
+            )}
+        </View>
+      )
+    }
+
 
   }
 
