@@ -96,7 +96,7 @@ const SubPost : React.FC<SPprops> = ({ parsed }) => {
                     <Card.Header
                         title={"r/" + parsed.data.subreddit}
                         thumbStyle={{ width: 40, height: 40 }}
-                        thumb={subredditPic}
+                        thumb={(subredditPic) ? subredditPic : 'https://www.elementaryos-fr.org/wp-content/uploads/2019/08/logo-reddit.png'}
                     />
                     <Card.Body>
                         <View>
