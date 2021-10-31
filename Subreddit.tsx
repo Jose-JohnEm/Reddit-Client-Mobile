@@ -62,6 +62,8 @@ export const SubReddit = ({subredditName = ''}) => {
   const [hotpostList, setHotPostList] = useState([])
   const [newpostList, setNewPostList] = useState([])
   const [randompostList, setRandomPostList] = useState([])
+  const [toppostList, setTopPostList] = useState([])
+  const [bestpostList, setBestPostList] = useState([])
   const [filterIdx, setFilterIdx] = useState(0)
   const [subreddit, setSubreddit] = useState(
     {
@@ -81,15 +83,24 @@ export const SubReddit = ({subredditName = ''}) => {
 
       return (
           <View style={filterStyle.filterButton}>
-              <Button type={primOrGhost(0)} style={filterStyle.leftButton} onPress={() => {setFilterIdx(0)}} >Hot</Button>
-              <Button type={primOrGhost(1)} style={filterStyle.midButton} onPress={() => {setFilterIdx(1)}} >New</Button>
-              <Button type={primOrGhost(2)} style={filterStyle.rightButton} onPress={() => {setFilterIdx(2)}} >Random</Button>
+              <Button type={primOrGhost(0)} style={filterStyle.leftButton} onPress={() => {setFilterIdx(0)}} >Best</Button>
+              <Button type={primOrGhost(1)} style={filterStyle.midButton} onPress={() => {setFilterIdx(1)}} >Hot</Button>
+              <Button type={primOrGhost(2)} style={filterStyle.midButton} onPress={() => {setFilterIdx(2)}} >New</Button>
+              <Button type={primOrGhost(3)} style={filterStyle.midButton} onPress={() => {setFilterIdx(3)}} >Top</Button>
+              <Button type={primOrGhost(4)} style={filterStyle.rightButton} onPress={() => {setFilterIdx(4)}} >Random</Button>
           </View>
       )
   }
 
   const getSubredditPosts = () => {
-    let uri = (subredditName) ? `https://oauth.reddit.com/r/${subredditName}/hot` : 'https://oauth.reddit.com/hot'
+    let uri = (subredditName) ? `https://oauth.reddit.com/r/${subredditName}/best` : 'https://oauth.reddit.com/best'
+    fetchOAuth(uri)
+      .then(response => response.json())
+      .then((json) => {
+        setBestPostList(json.data.children)
+      }).catch(error => console.error(error))
+
+    uri = (subredditName) ? `https://oauth.reddit.com/r/${subredditName}/hot` : 'https://oauth.reddit.com/hot'
     fetchOAuth(uri)
       .then(response => response.json())
       .then((json) => {
@@ -101,6 +112,13 @@ export const SubReddit = ({subredditName = ''}) => {
       .then(response => response.json())
       .then((json) => {
         setNewPostList(json.data.children)
+      }).catch(error => console.error(error))
+
+    uri = (subredditName) ? `https://oauth.reddit.com/r/${subredditName}/top` : 'https://oauth.reddit.com/top'
+    fetchOAuth(uri)
+      .then(response => response.json())
+      .then((json) => {
+        setTopPostList(json.data.children)
       }).catch(error => console.error(error))
 
     uri = (subredditName) ? `https://oauth.reddit.com/r/${subredditName}/random` : 'https://oauth.reddit.com/random'
@@ -137,7 +155,7 @@ export const SubReddit = ({subredditName = ''}) => {
     if (filterIdx == 0) {
       return (
         <View>
-        {hotpostList.map(
+        {bestpostList.map(
               sPost => {
                 return (
                   <SubPost key={i++} parsed={sPost}/>
@@ -150,7 +168,7 @@ export const SubReddit = ({subredditName = ''}) => {
     if (filterIdx == 1) {
       return (
         <View>
-        {newpostList.map(
+        {hotpostList.map(
               sPost => {
                 return (
                   <SubPost key={i++} parsed={sPost}/>
@@ -161,6 +179,32 @@ export const SubReddit = ({subredditName = ''}) => {
       )
     }
     if (filterIdx == 2) {
+      return (
+        <View>
+        {newpostList.map(
+              sPost => {
+                return (
+                  <SubPost key={i++} parsed={sPost}/>
+                )
+              }
+            )}
+        </View>
+      )
+    }
+    if (filterIdx == 3) {
+      return (
+        <View>
+        {toppostList.map(
+              sPost => {
+                return (
+                  <SubPost key={i++} parsed={sPost}/>
+                )
+              }
+            )}
+        </View>
+      )
+    }
+    if (filterIdx == 4) {
       return (
         <View>
         {randompostList.map(
